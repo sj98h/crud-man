@@ -64,6 +64,15 @@ header h2:nth-child(even) {
   display: flex;
   justify-content: center;
   align-items: center;
+  cursor: pointer;
+  border: 1px solid #aaa;
+  overflow: hidden;
+  background-size: cover;
+  background-position: center;
+}
+.thumb img {
+  max-width: 100%;
+  max-height: 100%;
 }
 .image-input {
   display: none;
@@ -77,17 +86,18 @@ header h2:nth-child(even) {
   resize: vertical;
 }
 .submit {
-  width: 60px;
-  height: 30px;
+  width: 80px;
+  height: 35px;
+  border: 1px solid dodgerblue;
   background-color: lightskyblue;
   border-radius: 30px;
   margin-left: auto;
   margin-top: 10px;
-  border: none;
   cursor: pointer;
   transition: 0.2s;
 }
 .submit:hover {
+  transform: scale(1.1);
   color: #fff;
   background-color: midnightblue;
 }
@@ -117,6 +127,11 @@ main {
   border-radius: 5px;
   overflow: hidden;
   padding-top: 100%; /* 1:1 비율 유지 */
+  transition: 0.2s;
+  cursor: pointer;
+}
+.list-wrap li:hover {
+  transform: scale(1.05) rotate(1deg);
 }
 .img-cont {
   position: absolute;
@@ -153,6 +168,141 @@ main {
   white-space: nowrap;
   overflow: hidden;
   word-break: break-all;
+}
+
+/* 전체 백드롭 스타일 */
+.backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  visibility: hidden; /* 초기 상태에서 숨김 */
+}
+
+/* 백드롭 보이기 */
+.backdrop.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* 모달 컨테이너 스타일 */
+.modal-container {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.8);
+  max-width: 800px;
+  width: 90%;
+  min-height: 400px;
+  max-height: 800px;
+
+  border: 1px solid #000;
+  background-color: #fff;
+  z-index: 2;
+  padding: 20px;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  opacity: 0;
+  visibility: hidden; /* 초기 상태에서 숨김 */
+  transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s ease;
+}
+
+/* 모달 열림 애니메이션 */
+.modal-container.open {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+  visibility: visible;
+}
+
+/* 모달 닫힘 애니메이션 */
+.modal-container.close {
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.8);
+  visibility: hidden;
+}
+
+/* 모달 헤더 스타일 */
+.modal-header {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #000;
+  padding-bottom: 10px;
+  font-size: 24px;
+}
+
+/* 모달 바디 스타일 */
+.modal-body {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* 두 열로 나누기 */
+  gap: 10px;
+  height: 100%;
+  overflow: hidden;
+  overflow-y: auto;
+}
+
+.modal-title {
+  max-width: calc(100% - 150px);
+}
+
+.modal-img {
+  background-color: #f0f0f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-size: cover; /* 배경 이미지가 공간에 맞게 커지도록 설정 */
+  background-position: center; /* 배경 이미지가 중앙에 위치하도록 설정 */
+  max-height: 400px;
+}
+
+.modal-text {
+  padding: 10px;
+  overflow-y: auto; /* 내용이 길어질 경우 스크롤 */
+}
+
+/* 버튼 스타일 */
+.edit-btn,
+.close-btn {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 8px 20px;
+  cursor: pointer;
+  font-size: 16px;
+  border-radius: 4px;
+  transition: background-color 0.23s ease;
+}
+.close-btn {
+  background-color: #f12e2e;
+}
+
+.edit-btn:hover {
+  background-color: #0056b3;
+}
+.close-btn:hover {
+  background-color: #a11f1f;
+}
+
+#removeImageButton {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-size: 16px;
+  border-radius: 4px;
+  margin-top: 10px;
+}
+#removeImageButton:hover {
+  background-color: #c82333;
 }
 
 /* 미디어쿼리 */

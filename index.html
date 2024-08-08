@@ -7,6 +7,22 @@
     <link rel="stylesheet" href="css/style.css" />
   </head>
   <body>
+    <!-- 모달과 백드롭 -->
+    <div id="backDrop" class="backdrop"></div>
+    <div id="modal" class="modal-container">
+      <div class="modal-header">
+        <span class="modal-title">제목이 들어감</span>
+        <div>
+          <button id="editButton" class="edit-btn">수정</button>
+          <button id="closeButton" class="close-btn">삭제</button>
+        </div>
+      </div>
+      <div class="modal-body">
+        <div class="modal-img"></div>
+        <div class="modal-text">내용이 들어감</div>
+      </div>
+    </div>
+
     <header>
       <h2>C</h2>
       <h2>R</h2>
@@ -19,89 +35,272 @@
 
     <div class="layout">
       <div class="edit-area">
-        <form action="">
-          <div class="thumb">사진 선택</div>
+        <form id="editForm">
+          <div class="thumb" id="imgSelector">사진 선택</div>
           <input
             type="file"
-            name=""
             id="imgInput"
             class="image-input"
-            for="img" />
+            accept="image/*" />
           <input
             type="text"
             id="title"
             class="title-input"
-            placeholder="제목을 입력하세요" />
-          <textarea id="desc" class="desc-input" placeholder="내용"></textarea>
-          <button type="submit" class="submit">등록</button>
+            placeholder="제목을 입력하세요"
+            required />
+          <textarea
+            id="desc"
+            class="desc-input"
+            placeholder="내용"
+            required></textarea>
+          <button type="submit" class="submit" id="contentSubmit">등록</button>
         </form>
       </div>
 
       <main>
         <ul class="list-wrap">
-          <li>
-            <div class="img-cont">
-              <img src="img/오렌지.jpg" alt="" />
-            </div>
-            <div class="txt-cont">
-              <h3 class="content-title">제목이다</h3>
-              <p class="content-desc">
-                참고로 난 내용zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz
-              </p>
-            </div>
-          </li>
-          <li>
-            <div class="img-cont">
-              <!-- <img src="img/오렌지.jpg" alt="" /> -->
-            </div>
-          </li>
-          <li>
-            <div class="img-cont">
-              <!-- <img src="img/오렌지.jpg" alt="" /> -->
-            </div>
-          </li>
-          <li>
-            <div class="img-cont">
-              <!-- <img src="img/오렌지.jpg" alt="" /> -->
-            </div>
-          </li>
-          <li>
-            <div class="img-cont">
-              <!-- <img src="img/오렌지.jpg" alt="" /> -->
-            </div>
-          </li>
-          <li>
-            <div class="img-cont">
-              <!-- <img src="img/오렌지.jpg" alt="" /> -->
-            </div>
-          </li>
-          <li>
-            <div class="img-cont">
-              <!-- <img src="img/오렌지.jpg" alt="" /> -->
-            </div>
-          </li>
-          <li>
-            <div class="img-cont">
-              <!-- <img src="img/오렌지.jpg" alt="" /> -->
-            </div>
-          </li>
-          <li>
-            <div class="img-cont">
-              <!-- <img src="img/오렌지.jpg" alt="" /> -->
-            </div>
-          </li>
-          <li>
-            <div class="img-cont">
-              <!-- <img src="img/오렌지.jpg" alt="" /> -->
-            </div>
-          </li>
-          <li>
-            <div class="img-cont">
-              <!-- <img src="img/오렌지.jpg" alt="" /> -->
-            </div>
-          </li>
+          <!-- 데이터가 이곳에 동적으로 추가됩니다 -->
         </ul>
       </main>
     </div>
+
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
+      import {
+        getFirestore,
+        collection,
+        getDocs,
+        addDoc,
+        deleteDoc,
+        doc,
+        getDoc,
+        updateDoc,
+      } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
+      import {
+        getStorage,
+        ref,
+        uploadBytes,
+        getDownloadURL,
+      } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-storage.js";
+
+      // Firebase 설정
+      const firebaseConfig = {
+        apiKey: "AIzaSyBr3SYhbfSdq3sWyXb7E3LAAHOJRLxIkzc",
+        authDomain: "sparta-d3c3b.firebaseapp.com",
+        projectId: "sparta-d3c3b",
+        storageBucket: "sparta-d3c3b.appspot.com",
+        messagingSenderId: "227618650328",
+        appId: "1:227618650328:web:6b9fec38061ffaa3127fad",
+        measurementId: "G-3HZ8699M4Y",
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const db = getFirestore(app);
+      const storage = getStorage(app);
+
+      let currentItemId = null;
+
+      document.addEventListener("DOMContentLoaded", async () => {
+        async function fetchData() {
+          const querySnapshot = await getDocs(collection(db, "cities"));
+          const items = [];
+          querySnapshot.forEach((doc) => {
+            items.push({ id: doc.id, ...doc.data() });
+          });
+          return items;
+        }
+
+        function renderList(items) {
+          const listWrap = document.querySelector(".list-wrap");
+          listWrap.innerHTML = ""; // 기존 리스트 비우기
+
+          items.forEach((item) => {
+            const listItem = document.createElement("li");
+            listItem.setAttribute("data-id", item.id); // 데이터 ID를 리스트 항목에 저장
+            listItem.innerHTML = `
+            <div class="img-cont">
+              <img src="${item.imageUrl}" alt="" />
+            </div>
+            <div class="txt-cont">
+              <h3 class="content-title">${item.title}</h3>
+              <p class="content-desc">${item.description}</p>
+            </div>`;
+            listWrap.appendChild(listItem);
+          });
+
+          // 리스트 항목 클릭 시 모달 열기
+          document.querySelectorAll(".list-wrap li").forEach((li) => {
+            li.addEventListener("click", async () => {
+              const id = li.getAttribute("data-id");
+              const docRef = doc(db, "cities", id);
+              const docSnap = await getDoc(docRef); // getDoc 사용
+              if (docSnap.exists()) {
+                const data = docSnap.data();
+                openModal(id, data.title, data.description, data.imageUrl);
+              }
+            });
+          });
+        }
+
+        function openModal(id, title, description, imageUrl) {
+          currentItemId = id;
+          document.querySelector(".modal-title").textContent = title;
+          document.querySelector(".modal-text").textContent = description;
+          document.querySelector(
+            ".modal-img"
+          ).style.backgroundImage = `url(${imageUrl})`;
+          document.getElementById("modal").classList.add("open");
+          document.getElementById("backDrop").classList.add("show"); // 백드롭 표시
+        }
+
+        function closeModal() {
+          document.getElementById("modal").classList.remove("open"); // "open" 클래스를 제거하여 모달을 닫음
+          setTimeout(() => {
+            document.getElementById("backDrop").classList.remove("show"); // 백드롭 숨김
+          }, 300); // 애니메이션 시간과 동일하게 설정
+        }
+
+        // 삭제 버튼 클릭 시
+        document
+          .getElementById("closeButton")
+          .addEventListener("click", async () => {
+            if (currentItemId) {
+              try {
+                await deleteDoc(doc(db, "cities", currentItemId));
+                alert("삭제 완료");
+                const items = await fetchData();
+                renderList(items);
+                closeModal();
+              } catch (error) {
+                console.error("문제가 발생했습니다: ", error);
+              }
+            }
+          });
+
+        // 수정 버튼 클릭 시 데이터 로드
+        document
+          .getElementById("editButton")
+          .addEventListener("click", async () => {
+            if (currentItemId) {
+              try {
+                const docRef = doc(db, "cities", currentItemId);
+                const docSnap = await getDoc(docRef); // getDoc 사용
+
+                if (docSnap.exists()) {
+                  const data = docSnap.data();
+
+                  // 폼에 데이터 채우기
+                  document.querySelector("#title").value = data.title;
+                  document.querySelector("#desc").value = data.description;
+
+                  // 이미지 썸네일 표시
+                  const imgSelector = document.querySelector("#imgSelector");
+                  imgSelector.style.backgroundImage = `url(${data.imageUrl})`;
+                  imgSelector.textContent = ""; // 이미지가 선택되면 텍스트 삭제
+
+                  // 이미지 파일을 입력창에 설정
+                  const imgInput = document.querySelector("#imgInput");
+                  imgInput.value = ""; // 파일 입력 초기화
+                  imgInput.setAttribute("data-url", data.imageUrl); // 이미지 URL 저장
+
+                  closeModal(); // 모달 닫기
+                }
+              } catch (error) {
+                console.error("문제가 발생했습니다: ", error);
+              }
+            }
+          });
+
+        // 수정된 데이터 저장
+        document
+          .getElementById("editForm")
+          .addEventListener("submit", async (e) => {
+            e.preventDefault(); // 폼의 기본 동작 방지
+
+            const title = document.querySelector("#title").value;
+            const desc = document.querySelector("#desc").value;
+            const imgFile = document.querySelector("#imgInput").files[0];
+            const imgUrl = document
+              .querySelector("#imgInput")
+              .getAttribute("data-url"); // 기존 이미지 URL 가져오기
+
+            if (!title || !desc) {
+              alert("모든 필드를 채워주세요.");
+              return;
+            }
+
+            try {
+              let newImgUrl = imgUrl;
+
+              if (imgFile) {
+                // 이미지 파일을 Firebase Storage에 업로드
+                const storageRef = ref(storage, "images/" + imgFile.name);
+                await uploadBytes(storageRef, imgFile);
+                newImgUrl = await getDownloadURL(storageRef);
+              }
+
+              // 문서 ID가 없는 경우 (새 문서 추가)
+              if (!currentItemId) {
+                await addDoc(collection(db, "cities"), {
+                  title: title,
+                  description: desc,
+                  imageUrl: newImgUrl,
+                });
+              } else {
+                // 문서 ID가 있는 경우 (기존 문서 업데이트)
+                await updateDoc(doc(db, "cities", currentItemId), {
+                  title: title,
+                  description: desc,
+                  imageUrl: newImgUrl,
+                });
+              }
+
+              alert("저장 완료");
+
+              // 리스트 갱신
+              const items = await fetchData();
+              renderList(items);
+
+              // 폼 초기화
+              document.getElementById("editForm").reset();
+              document.querySelector("#imgSelector").style.backgroundImage = ""; // 썸네일 초기화
+              document.querySelector("#imgInput").removeAttribute("data-url"); // 데이터 URL 초기화
+              imgSelector.textContent = "사진 선택";
+              currentItemId = null; // 현재 항목 ID 초기화
+            } catch (error) {
+              console.error("문제가 발생했습니다: ", error);
+            }
+          });
+
+        // 백드롭 클릭 시 모달 닫기
+        document
+          .getElementById("backDrop")
+          .addEventListener("click", closeModal);
+
+        // 이미지 선택 div를 클릭하면 input 파일 열기
+        document.getElementById("imgSelector").addEventListener("click", () => {
+          document.getElementById("imgInput").click();
+        });
+
+        // 파일 선택 시 썸네일 표시
+        document.getElementById("imgInput").addEventListener("change", (e) => {
+          const file = e.target.files[0];
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = () => {
+              document.querySelector(
+                "#imgSelector"
+              ).style.backgroundImage = `url(${reader.result})`;
+              document.querySelector("#imgSelector").textContent = ""; // 이미지가 선택되면 텍스트 삭제
+            };
+            reader.readAsDataURL(file);
+          }
+        });
+
+        // 페이지 로드 시 데이터 렌더링
+        const items = await fetchData();
+        renderList(items);
+      });
+    </script>
   </body>
 </html>
