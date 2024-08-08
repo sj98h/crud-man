@@ -1,0 +1,98 @@
+@charset 'UTF-8';
+@import url("https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Song+Myung&display=swap");
+@import url(animation.css);
+@font-face {
+  font-family: "InkLipquid";
+  src: url("https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_one@1.0/InkLipquid.woff")
+    format("woff");
+  font-weight: normal;
+  font-style: normal;
+}
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+}
+* {
+  font-family: "InkLipquid";
+  font-size: 20px;
+}
+
+header {
+  width: 50%;
+  animation-name: title;
+  animation-duration: 5s;
+  position: fixed;
+  left: 0%;
+}
+header h2 {
+  font-family: "Song Myung", serif;
+  font-size: 130px;
+  -webkit-text-stroke: 1px black;
+  color: transparent;
+  display: inline;
+}
+header h2:nth-child(even) {
+  color: #000;
+}
+
+.layout {
+  display: flex;
+  align-items: flex-end;
+}
+.layout form {
+  display: flex;
+  flex-direction: column;
+  row-gap: 5px;
+}
+.edit-area {
+  width: 50%;
+  height: 50vh;
+  border-top: 1px solid dimgrey;
+  padding: 1rem;
+  box-sizing: border-box;
+}
+.thumb {
+  width: 100px;
+  height: 120px;
+  background-color: lightgray;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.image-input {
+  display: none;
+}
+.title-input {
+  height: 22px;
+}
+.desc-input {
+  max-width: 100%;
+  min-height: 80px;
+  resize: vertical;
+}
+.submit {
+  width: 60px;
+  height: 30px;
+  background-color: lightskyblue;
+  border-radius: 30px;
+  margin-left: auto;
+  margin-top: 10px;
+  border: none;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.submit:hover {
+  color: #fff;
+  background-color: midnightblue;
+}
+
+main {
+  width: 50%;
+  height: 100vh;
+  overflow: hidden;
+  overflow-y: scroll;
+  background-color: dimgrey;
+  margin-left: auto;
+}

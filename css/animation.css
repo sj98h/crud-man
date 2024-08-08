@@ -1,0 +1,14 @@
+@keyframes title {
+  0% {
+    position: fixed;
+    left: -100%;
+  }
+  40% {
+    position: fixed;
+    left: 5%;
+  }
+  100% {
+    position: fixed;
+    left: 0%;
+  }
+}
